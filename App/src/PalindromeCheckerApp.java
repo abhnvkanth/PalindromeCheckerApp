@@ -1,105 +1,61 @@
-import java.util.*;
+import java.util.Scanner;
+import java.util.Stack;
 
-// Strategy Interface
-interface PalindromeStrategy {
-    boolean check(String input);
-}
+public class PalindromeCheckerApp {
 
-// Stack Strategy Implementation
-class StackStrategy implements PalindromeStrategy {
+    // Method 1: Loop Method
+    public static boolean loopMethod(String str) {
+        int n = str.length();
+        for (int i = 0; i < n / 2; i++) {
+            if (str.charAt(i) != str.charAt(n - 1 - i)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-    public boolean check(String input) {
-
-        String processed = input.replaceAll("\\s+", "").toLowerCase();
+    // Method 2: Stack Method
+    public static boolean stackMethod(String str) {
         Stack<Character> stack = new Stack<>();
 
-        for (char ch : processed.toCharArray()) {
+        for (char ch : str.toCharArray()) {
             stack.push(ch);
         }
 
-        for (char ch : processed.toCharArray()) {
+        for (char ch : str.toCharArray()) {
             if (ch != stack.pop()) {
                 return false;
             }
         }
-
         return true;
     }
-}
-
-// Deque Strategy Implementation
-class DequeStrategy implements PalindromeStrategy {
-
-    public boolean check(String input) {
-
-        String processed = input.replaceAll("\\s+", "").toLowerCase();
-        Deque<Character> deque = new LinkedList<>();
-
-        for (char ch : processed.toCharArray()) {
-            deque.addLast(ch);
-        }
-
-        while (deque.size() > 1) {
-            if (!deque.removeFirst().equals(deque.removeLast())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-}
-
-// Context Class
-class PalindromeContext {
-
-    private PalindromeStrategy strategy;
-
-    public PalindromeContext(PalindromeStrategy strategy) {
-        this.strategy = strategy;
-    }
-
-    public boolean executeStrategy(String input) {
-        return strategy.check(input);
-    }
-}
-
-// Main Application
-public class PalindromeCheckerApp {
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
-        System.out.println("=== Strategy Pattern Palindrome Checker ===");
-        System.out.println("Choose Algorithm:");
-        System.out.println("1. Stack Strategy");
-        System.out.println("2. Deque Strategy");
-        System.out.print("Enter choice (1 or 2): ");
-
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // consume newline
-
+        System.out.println("=== Performance Comparison of Palindrome Algorithms ===");
         System.out.print("Enter a string: ");
-        String input = scanner.nextLine();
+        String input = sc.nextLine();
 
-        PalindromeStrategy strategy;
+        String processed = input.replaceAll("\\s+", "").toLowerCase();
 
-        if (choice == 1) {
-            strategy = new StackStrategy();
-        } else {
-            strategy = new DequeStrategy();
-        }
+        // Measure Loop Method
+        long start1 = System.nanoTime();
+        boolean result1 = loopMethod(processed);
+        long end1 = System.nanoTime();
 
-        PalindromeContext context = new PalindromeContext(strategy);
+        // Measure Stack Method
+        long start2 = System.nanoTime();
+        boolean result2 = stackMethod(processed);
+        long end2 = System.nanoTime();
 
-        boolean result = context.executeStrategy(input);
+        System.out.println("\nLoop Method Result: " + result1);
+        System.out.println("Loop Method Time: " + (end1 - start1) + " ns");
 
-        if (result) {
-            System.out.println("Result: The given string is a Palindrome.");
-        } else {
-            System.out.println("Result: The given string is NOT a Palindrome.");
-        }
+        System.out.println("\nStack Method Result: " + result2);
+        System.out.println("Stack Method Time: " + (end2 - start2) + " ns");
 
-        scanner.close();
+        sc.close();
     }
 }
